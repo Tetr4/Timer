@@ -15,6 +15,7 @@
  */
 package com.example.androiddevchallenge
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -23,13 +24,13 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.androiddevchallenge.ui.theme.MyTheme
+import com.google.android.material.composethemeadapter.MdcTheme
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MyTheme {
+            MdcTheme {
                 MyApp()
             }
         }
@@ -47,15 +48,15 @@ fun MyApp() {
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
 @Composable
 fun LightPreview() {
-    MyTheme {
+    MdcTheme {
         MyApp()
     }
 }
 
-@Preview("Dark Theme", widthDp = 360, heightDp = 640)
+@Preview("Dark Theme", widthDp = 360, heightDp = 640, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun DarkPreview() {
-    MyTheme(darkTheme = true) {
+    MdcTheme {
         MyApp()
     }
 }
