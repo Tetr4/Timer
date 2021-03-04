@@ -58,13 +58,19 @@ fun DurationPicker(onStartTimer: (durationMs: Long) -> Unit) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             DurationDisplay(durationMs = durationMs)
+            Spacer(Modifier.padding(top = 16.dp))
             Numpad(onAddDigit = onAddDigit)
         }
         Column(verticalArrangement = Arrangement.SpaceBetween) {
             DeleteButton(onClick = onDropDigit)
-            // TODO not sure why SpaceBetween does not work, so use padding here for now
+            // TODO not sure why SpaceBetween does not work, so use a spacer for now
             Spacer(Modifier.padding(top = 36.dp))
-            PlayButton(onClick = { onStartTimer(durationMs) })
+            PlayButton(
+                onClick = {
+                    onStartTimer(durationMs)
+                    durationMs = 0
+                }
+            )
         }
     }
 }
@@ -74,7 +80,7 @@ private fun DurationDisplay(durationMs: Long) {
     Text(
         text = durationMs.prettyPrintDuration(),
         style = MaterialTheme.typography.h4,
-        color = MaterialTheme.colors.primary
+        color = MaterialTheme.colors.onSurface
     )
 }
 
@@ -84,7 +90,7 @@ private fun DeleteButton(onClick: () -> Unit) {
         Icon(
             Icons.Outlined.Backspace,
             contentDescription = "Delete",
-            tint = MaterialTheme.colors.secondary
+            tint = MaterialTheme.colors.onSurface
         )
     }
 }
@@ -123,7 +129,7 @@ private fun Number(number: Int, onAddDigit: (Int) -> Unit) {
         Text(
             number.toString(),
             style = MaterialTheme.typography.button,
-            color = MaterialTheme.colors.secondary
+            color = MaterialTheme.colors.primary
         )
     }
 }

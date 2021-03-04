@@ -43,7 +43,11 @@ import com.example.androiddevchallenge.ui.widgets.AppBar
 import com.example.androiddevchallenge.ui.widgets.DurationPicker
 import com.example.androiddevchallenge.ui.widgets.Timer
 import com.google.android.material.composethemeadapter.MdcTheme
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
+
+private const val TICKER_UPDATE_DELAY_MS = 15L // 60 FPS
 
 class MainActivity : AppCompatActivity() {
     @OptIn(ExperimentalMaterialApi::class)
@@ -58,25 +62,34 @@ class MainActivity : AppCompatActivity() {
 }
 
 // Start building your app here!
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ObsoleteCoroutinesApi::class)
 @Composable
 fun MyApp(initialState: BottomSheetValue = BottomSheetValue.Collapsed) {
+    var remainingTime by remember { mutableStateOf(0L) }
+    var totalTime by remember { mutableStateOf(0L) }
     val coroutineScope = rememberCoroutineScope()
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(initialState)
     )
-    var remainingTime by remember { mutableStateOf(0L) }
+
     val onStartTimer: (Long) -> Unit = { durationMs ->
         coroutineScope.launch {
-            remainingTime = durationMs
             bottomSheetScaffoldState.bottomSheetState.collapse()
-        }
-    }
-    val onTimerFinished: () -> Unit = {
-        coroutineScope.launch {
+
+            totalTime = durationMs
+            remainingTime = totalTime
+            val ticker = ticker(TICKER_UPDATE_DELAY_MS)
+            while (remainingTime > 0) {
+                ticker.receive()
+                remainingTime -= TICKER_UPDATE_DELAY_MS
+            }
+            remainingTime = 0
+            ticker.cancel()
+
             bottomSheetScaffoldState.bottomSheetState.expand()
         }
     }
+
     BottomSheetScaffold(
         topBar = { AppBar(stringResource(R.string.app_name)) },
         sheetContent = { DurationPicker(onStartTimer = onStartTimer) },
@@ -90,7 +103,8 @@ fun MyApp(initialState: BottomSheetValue = BottomSheetValue.Collapsed) {
         ) {
             Timer(
                 remainingTime = remainingTime,
-                onTimerFinished = onTimerFinished,
+                totalTime = totalTime,
+                onStopTimer = { remainingTime = 0 }
             )
         }
     }

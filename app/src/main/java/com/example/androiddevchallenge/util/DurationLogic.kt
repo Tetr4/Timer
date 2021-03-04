@@ -57,3 +57,9 @@ fun Long.prettyPrintDuration(): String {
     val seconds = this.seconds.toString().padStart(2, '0')
     return "${hours}h ${minutes}m ${seconds}s"
 }
+
+fun Long.prettyPrintRemainingTime(): String {
+    if (hours > 0) return "${hours}h"
+    if (minutes > 0) return "${minutes}m"
+    return "${seconds + 1}s" // + 1 so it feels more natural
+}
